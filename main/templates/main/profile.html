@@ -1,0 +1,130 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ profile_user.username }} - MiniSocial</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="logo">
+        MiniSocial
+    </div>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/users/">Users</a>
+        <a href="/profile/{{ user.id }}/">My Profile</a>
+    </div>
+
+</nav>
+
+
+<div class="profile-page">
+
+    <div class="profile-hero">
+
+        <div class="big-avatar">
+            {{ profile_user.username|first|upper }}
+        </div>
+
+        <h1>{{ profile_user.username }}</h1>
+
+        <p>MiniSocial member</p>
+
+        <div class="profile-stats">
+
+            <div>
+                <strong>{{ user_posts.count }}</strong>
+                <span>Posts</span>
+            </div>
+
+            <div>
+                <strong>{{ followers_count }}</strong>
+                <span>Followers</span>
+            </div>
+
+            <div>
+                <strong>{{ following_count }}</strong>
+                <span>Following</span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <h2 class="profile-post-title">
+        {{ profile_user.username }}'s Posts
+    </h2>
+
+
+    {% for post in user_posts %}
+
+    <div class="profile-post">
+
+        <div class="post-header">
+
+            <div class="small-avatar">
+                {{ profile_user.username|first|upper }}
+            </div>
+
+            <div>
+                <strong>{{ profile_user.username }}</strong>
+
+                <small>
+                    {{ post.created_at }}
+                </small>
+            </div>
+
+        </div>
+
+        <p class="post-text">
+            {{ post.content }}
+        </p>
+
+        <div class="post-stats">
+
+            <span>
+                ❤️ {{ post.likes.count }} Likes
+            </span>
+
+            <span>
+                💬 {{ post.comment_set.count }} Comments
+            </span>
+
+        </div>
+
+    </div>
+
+    {% empty %}
+
+    <div class="empty-card">
+
+        <div class="empty-icon">
+            📝
+        </div>
+
+        <h2>No posts yet</h2>
+
+        <p>
+            This user hasn't posted anything yet.
+        </p>
+
+    </div>
+
+    {% endfor %}
+
+
+    <a href="/" class="back-home">
+        ← Back to Home
+    </a>
+
+</div>
+
+</body>
+</html>

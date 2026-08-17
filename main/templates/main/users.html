@@ -1,0 +1,144 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Find People - MiniSocial</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="logo">
+        MiniSocial
+    </div>
+
+    <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/users/">Users</a>
+    <a href="/profile/{{ user.id }}/">My Profile</a>
+
+    <form method="POST" action="{% url 'logout' %}" class="logout-form">
+        {% csrf_token %}
+        <button type="submit" class="logout-button">
+            Logout
+        </button>
+    </form>
+</div>
+
+</nav>
+
+
+<div class="users-page">
+
+    <div class="users-header">
+
+        <h1>👥 Find People</h1>
+
+        <p>
+            Connect with other people on MiniSocial.
+        </p>
+        <form method="GET" class="search-form">
+
+    <input
+        type="text"
+        name="search"
+        value="{{ search }}"
+        placeholder="🔍 Search users..."
+    >
+
+    <button type="submit">
+        Search
+    </button>
+
+</form>
+
+    </div>
+
+
+    <div class="users-grid">
+
+        {% for person in users %}
+
+        <div class="user-card">
+
+            <div class="user-avatar">
+                {{ person.username|first|upper }}
+            </div>
+
+            <h2>{{ person.username }}</h2>
+
+            <p class="member-text">
+                MiniSocial member
+            </p>
+            <div class="user-stats">
+
+    <div>
+        <strong>{{ person.post_set.count }}</strong>
+        <span>Posts</span>
+    </div>
+
+    <div>
+        <strong>{{ person.followers.count }}</strong>
+        <span>Followers</span>
+    </div>
+
+    <div>
+        <strong>{{ person.following.count }}</strong>
+        <span>Following</span>
+    </div>
+
+</div>
+
+
+            <div class="user-actions">
+
+                <a
+                    href="/profile/{{ person.id }}/"
+                    class="view-profile">
+                    View Profile
+                </a>
+
+
+                <form
+                    method="POST"
+                    action="{% url 'follow_user' person.id %}">
+
+                    {% csrf_token %}
+
+                    <button type="submit">
+                        👥 Follow / Unfollow
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        {% empty %}
+
+        <div class="empty-card">
+
+            <div class="empty-icon">
+                👥
+            </div>
+
+            <h2>No other users</h2>
+
+            <p>
+                There are no other users to follow yet.
+            </p>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+</body>
+</html>

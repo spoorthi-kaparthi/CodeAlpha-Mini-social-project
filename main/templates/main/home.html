@@ -1,0 +1,465 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MiniSocial</title>
+
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+
+<body>
+
+<!-- ================= NAVIGATION ================= -->
+
+<nav class="navbar">
+
+    <div class="logo">
+        MiniSocial
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/">
+            Home
+        </a>
+
+        <a href="/users/">
+            Users
+        </a>
+
+        <a href="/profile/{{ user.id }}/">
+            My Profile
+        </a>
+
+        <form method="POST"
+              action="{% url 'logout' %}"
+              class="logout-form">
+
+            {% csrf_token %}
+
+            <button type="submit"
+                    class="logout-button">
+                Logout
+            </button>
+
+        </form>
+
+    </div>
+
+</nav>
+
+
+<!-- ================= MAIN PAGE ================= -->
+
+<div class="page">
+
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+
+        <!-- PROFILE CARD -->
+
+        <div class="profile-card">
+
+            <div class="avatar">
+                {{ user.username|first|upper }}
+            </div>
+
+            <h2>
+                {{ user.username }}
+            </h2>
+
+            <p>
+                Welcome to your profile!
+            </p>
+
+            <a class="profile-button"
+               href="/profile/{{ user.id }}/">
+
+                View Profile
+
+            </a>
+
+        </div>
+
+
+        <!-- MENU CARD -->
+
+        <div class="menu-card">
+
+            <a href="/">
+                🏠 Home
+            </a>
+
+            <a href="/users/">
+                👥 Find People
+            </a>
+
+            <a href="/profile/{{ user.id }}/">
+                👤 My Profile
+            </a>
+
+        </div>
+
+
+        <!-- ================= SUGGESTIONS ================= -->
+
+        <div class="suggestions-card">
+
+            <h3>
+                People You May Know
+            </h3>
+
+
+            {% for person in suggestions %}
+
+                <div class="suggestion">
+
+
+                    <!-- USER AVATAR -->
+
+                    <div class="suggestion-avatar">
+
+                        {{ person.username|first|upper }}
+
+                    </div>
+
+
+                    <!-- USER INFORMATION -->
+
+                    <div class="suggestion-info">
+
+                        <strong>
+                            {{ person.username }}
+                        </strong>
+
+
+                        <a href="/profile/{{ person.id }}/">
+
+                            View Profile
+
+                        </a>
+
+
+                        <!-- FOLLOW FORM -->
+
+                        <form method="POST"
+                              action="{% url 'follow_user' person.id %}">
+
+                            {% csrf_token %}
+
+                            <button type="submit"
+                                    class="suggest-follow">
+
+                                Follow
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+
+            {% empty %}
+
+                <p class="no-suggestions">
+
+                    You're following everyone! 🎉
+
+                </p>
+
+            {% endfor %}
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN FEED ================= -->
+
+    <main class="feed">
+
+
+        <!-- WELCOME -->
+
+        <div class="welcome">
+
+            <h1>
+                Welcome, {{ user.username }} 👋
+            </h1>
+
+            <p>
+                Share something with your friends.
+            </p>
+
+        </div>
+
+
+        <!-- ================= CREATE POST ================= -->
+
+        <div class="create-card">
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+
+                <textarea
+                    name="content"
+                    placeholder="What's on your mind?"
+                    required></textarea>
+
+
+                <div class="post-actions">
+
+                    <span>
+                        💬 Share your thoughts
+                    </span>
+
+
+                    <button type="submit">
+
+                        Create Post
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- ================= POSTS TITLE ================= -->
+
+        <h2 class="section-title">
+
+            Latest Posts
+
+        </h2>
+
+
+        <!-- ================= POSTS ================= -->
+
+        {% for post in posts %}
+
+
+            <div class="post-card">
+
+
+                <!-- POST HEADER -->
+
+                <div class="post-header">
+
+
+                    <div class="small-avatar">
+
+                        {{ post.user.username|first|upper }}
+
+                    </div>
+
+
+                    <div>
+
+                        <a
+                            class="username"
+                            href="/profile/{{ post.user.id }}/">
+
+                            {{ post.user.username }}
+
+                        </a>
+
+
+                        <small>
+
+                            {{ post.created_at }}
+
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- POST CONTENT -->
+
+                <p class="post-text">
+
+                    {{ post.content }}
+
+                </p>
+
+
+                <!-- POST STATISTICS -->
+
+                <div class="post-stats">
+
+                    <span>
+
+                        ❤️ {{ post.likes.count }} Likes
+
+                    </span>
+
+
+                    <span>
+
+                        💬 {{ post.comment_set.count }} Comments
+
+                    </span>
+
+                </div>
+
+
+                <!-- LIKE BUTTON -->
+
+                <div class="post-buttons">
+
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+
+                        <input
+                            type="hidden"
+                            name="post_id"
+                            value="{{ post.id }}">
+
+
+                        <button
+                            type="submit"
+                            name="like"
+                            class="like-button">
+
+                            ❤️ Like
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+                <!-- ================= COMMENTS ================= -->
+
+                <div class="comments">
+
+                    <h3>
+                        Comments
+                    </h3>
+
+
+                    {% for comment in post.comment_set.all %}
+
+
+                        <div class="comment">
+
+                            <strong>
+
+                                {{ comment.user.username }}
+
+                            </strong>
+
+
+                            <span>
+
+                                {{ comment.content }}
+
+                            </span>
+
+                        </div>
+
+
+                    {% empty %}
+
+
+                        <p class="no-comments">
+
+                            No comments yet.
+
+                        </p>
+
+
+                    {% endfor %}
+
+
+                    <!-- COMMENT FORM -->
+
+                    <form method="POST"
+                          class="comment-form">
+
+
+                        {% csrf_token %}
+
+
+                        <input
+                            type="hidden"
+                            name="post_id"
+                            value="{{ post.id }}">
+
+
+                        <input
+                            type="text"
+                            name="comment"
+                            placeholder="Write a comment..."
+                            required>
+
+
+                        <button type="submit">
+
+                            Comment
+
+                        </button>
+
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+        {% empty %}
+
+
+            <!-- NO POSTS -->
+
+            <div class="empty-card">
+
+                <div class="empty-icon">
+
+                    📝
+
+                </div>
+
+
+                <h2>
+
+                    No posts yet
+
+                </h2>
+
+
+                <p>
+
+                    Be the first person to share something!
+
+                </p>
+
+            </div>
+
+
+        {% endfor %}
+
+
+    </main>
+
+</div>
+
+</body>
+</html>
